@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import gamesData from "../data/games.json";
 
 const Feed = () => {
-  const [games, setGames] = useState([]);
+  const [games, setGames] = useState<any[]>([]);
 
   useEffect(() => {
     setGames(gamesData);
@@ -14,14 +14,12 @@ const Feed = () => {
       <p>Connect with the community</p>
 
       <div className="posts-container">
-        {games.map((game: any) => {
-          return (
-            <div key={game.id} className="post-card">
-              <h2>{game.title}</h2>
-              <p>{game.description}</p>
-            </div>
-          );
-        })}
+        {games.map((game: any) => (
+          <div key={game.id} className="post-card">
+            <h2>{game.title}</h2>
+            <p>{game.description}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
