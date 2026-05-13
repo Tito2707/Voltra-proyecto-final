@@ -1,0 +1,38 @@
+[
+  {
+    "nombre": "Cyber Quest",
+    "imagen": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&q=80",
+    "likes": 42,
+    "ranking_estrellas": 5,
+    "reseñas": [
+      {
+        "usuario": "Alex_R",
+        "reseña": "Excelente mundo abierto y la comunidad está muy activa."
+      }
+    ]
+  },
+  {
+    "nombre": "Neon Arenas",
+    "imagen": "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=800&q=80",
+    "likes": 28,
+    "ranking_estrellas": 4,
+    "reseñas": [
+      {
+        "usuario": "MiraGames",
+        "reseña": "Competitivo y divertido; matchmaking fluido."
+      }
+    ]
+  },
+  {
+    "nombre": "Sky Ruins",
+    "imagen": "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&q=80",
+    "likes": 19,
+    "ranking_estrellas": 3,
+    "reseñas": [
+      {
+        "usuario": "DanBel",
+        "reseña": "Arte precioso, la historia necesita algo más de ritmo."
+      }
+    ]
+  }
+]
