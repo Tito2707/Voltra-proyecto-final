@@ -1,0 +1,49 @@
+[
+  {
+    "id": 1,
+    "nombre": "LunaGamer",
+    "avatar": "https://i.pravatar.cc/200?u=LunaGamer",
+    "banner": "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=1920&h=400&fit=crop",
+    "bio": "RPG addict Fantasy worlds are my second home ",
+    "totalPosts": 1,
+    "followers": 890,
+    "following": 245,
+    "reseñas": [
+      {
+        "usuario": "LunaGamer",
+        "reseña": "La atmósfera de Hollow Knight es simplemente perfecta. Combina dificultad, belleza y una historia sutil que te motiva a explorar más. Cada batalla contra un jefe se siente como una victoria épica."
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "nombre": "CraftyCat",
+    "avatar": "https://i.pravatar.cc/200?u=CraftyCat",
+    "banner": "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1920&h=400&fit=crop",
+    "bio": "Creative builder | Minecraft enthusiast",
+    "totalPosts": 1,
+    "followers": 1100,
+    "following": 420
+  },
+  {
+    "id": 3,
+    "nombre": "GwenBlade",
+    "avatar": "https://i.pravatar.cc/200?u=GwenBlade",
+    "banner": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1920&h=400&fit=crop",
+    "bio": "Action RPG enthusiast | Story-driven games lover"
+  },
+  {
+    "id": 4,
+    "nombre": "NeoPlayer",
+    "avatar": "https://i.pravatar.cc/200?u=NeoPlayer",
+    "banner": "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1920&h=400&fit=crop",
+    "bio": "Cyberpunk enthusiast | Futuristic worlds lover"
+  },
+  {
+    "id": 5,
+    "nombre": "BugHunter",
+    "avatar": "https://i.pravatar.cc/200?u=BugHunter",
+    "banner": "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1920&h=400&fit=crop",
+    "bio": "Hollow Knight speedrunner | Metroidvania lover"
+  }
+]
