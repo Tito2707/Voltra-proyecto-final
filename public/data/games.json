@@ -1,0 +1,132 @@
+[
+  {
+    "id": 1,
+    "nombre": "The Legend of Zelda: Breath of the Wild",
+    "imagen": "https://upload.wikimedia.org/wikipedia/en/c/c6/The_Legend_of_Zelda_Breath_of_the_Wild.jpg",
+    "likes": 15300,
+    "ranking_estrellas": 5,
+    "reseñas": [
+      {
+        "usuario": "LunaGamer",
+        "reseña": "Explorar Hyrule es una experiencia increíble. Cada rincón tiene secretos, desafíos y momentos de pura belleza. La libertad para resolver problemas de distintas formas lo hace único, y la música te sumerge completamente en el mundo."
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "nombre": "Minecraft",
+    "imagen": "https://upload.wikimedia.org/wikipedia/en/5/51/Minecraft_cover.png",
+    "likes": 21000,
+    "ranking_estrellas": 4, 
+    "reseñas": [
+      {
+        "usuario": "CraftyCat",
+        "reseña": "Minecraft nunca envejece. Es un espacio creativo sin límites donde puedes construir lo que imagines, desde casas hasta mundos completos. La comunidad es enorme y siempre hay algo nuevo por descubrir o mejorar."
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "nombre": "The Witcher 3: Wild Hunt",
+    "imagen": "https://cdn.akamai.steamstatic.com/steam/apps/292030/header.jpg",
+    "likes": 12500,
+    "ranking_estrellas": 5,
+    "reseñas": [
+      {
+        "usuario": "GwenBlade",
+        "reseña": "El nivel de detalle en The Witcher 3 es impresionante. Cada misión, incluso las secundarias, tiene peso narrativo y personajes memorables. Geralt es un protagonista complejo y el mundo te atrapa desde el primer momento."
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "nombre": "Cyberpunk 2077",
+    "imagen": "https://upload.wikimedia.org/wikipedia/en/9/9f/Cyberpunk_2077_box_art.jpg",
+    "likes": 8600,
+    "ranking_estrellas": 4,
+    "reseñas": [
+      {
+        "usuario": "NeoPlayer",
+        "reseña": "Después de varias actualizaciones, Cyberpunk 2077 finalmente brilla como debería. La ciudad está viva, los personajes son profundos y las misiones principales te mantienen pegado a la pantalla por horas."
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "nombre": "Hollow Knight",
+    "imagen": "https://cdn.akamai.steamstatic.com/steam/apps/367520/header.jpg",
+    "likes": 8900,
+    "ranking_estrellas": 5,
+    "reseñas": [
+      {
+        "usuario": "BugHunter",
+        "reseña": "La atmósfera de Hollow Knight es simplemente perfecta. Combina dificultad, belleza y una historia sutil que te motiva a explorar más. Cada batalla contra un jefe se siente como una victoria épica."
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "nombre": "Red Dead Redemption 2",
+    "imagen": "https://cdn.akamai.steamstatic.com/steam/apps/1174180/header.jpg",
+    "likes": 13600,
+    "ranking_estrellas": 5,
+    "reseñas": [
+      {
+        "usuario": "CowboyMike",
+        "reseña": "Una experiencia cinematográfica que combina narrativa, música y jugabilidad como pocos juegos. Cada misión y cada personaje tiene alma. Arthur Morgan es de los mejores protagonistas de la historia."
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "nombre": "Overwatch 2",
+    "imagen": "https://upload.wikimedia.org/wikipedia/en/8/89/Overwatch_2_Steam_artwork.jpg",
+    "likes": 7200,
+    "ranking_estrellas": 3,
+    "reseñas": [
+      {
+        "usuario": "AnaMain",
+        "reseña": "Overwatch 2 mantiene la esencia del original, con héroes carismáticos y partidas intensas. Sin embargo, algunos cambios en el formato han dividido a la comunidad. Aun así, sigue siendo muy divertido jugar en equipo."
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "nombre": "Elden Ring",
+    "imagen": "https://cdn.akamai.steamstatic.com/steam/apps/1245620/header.jpg",
+    "likes": 12200,
+    "ranking_estrellas": 5,
+    "reseñas": [
+      {
+        "usuario": "ShadowFox",
+        "reseña": "Elden Ring logra mezclar exploración y combate de forma magistral. Es desafiante, pero la sensación de superación tras cada enemigo vencido es incomparable. El diseño del mundo es simplemente impresionante."
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "nombre": "Stardew Valley",
+    "imagen": "https://cdn.akamai.steamstatic.com/steam/apps/413150/header.jpg",
+    "likes": 9700,
+    "ranking_estrellas": 5,
+    "reseñas": [
+      {
+        "usuario": "FarmDreamer",
+        "reseña": "Stardew Valley es un juego tranquilo y lleno de encanto. Empezar desde cero y ver crecer tu granja es muy satisfactorio. Además, los personajes del pueblo se sienten vivos y las estaciones cambian el ambiente completamente."
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "nombre": "God of War: Ragnarök",
+    "imagen": "https://image.api.playstation.com/vulcan/ap/rnd/202207/1117/qpCTTb74VvcbqDjxkBmY4i1G.jpg?w=440",
+    "likes": 9800,
+    "ranking_estrellas": 5,
+    "reseñas": [
+      {
+        "usuario": "NicoPlay",
+        "reseña": "La relación entre Kratos y Atreus se desarrolla de forma emotiva y madura. El combate es fluido, los escenarios impresionantes y la historia logra mantenerte al borde del asiento hasta el final."
+      }
+    ]
+  }
+]
