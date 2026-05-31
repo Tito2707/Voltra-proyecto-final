@@ -15,7 +15,7 @@
   {
     "id": 2,
     "nombre": "Minecraft",
-    "imagen": "/data/minecraft.jpg",
+    "imagen": "https://cdn2.steamgriddb.com/thumb/7344bcd24a4a0393f45cad1a212c62e7.jpg",
     "likes": 21000,
     "ranking_estrellas": 4, 
     "reseñas": [

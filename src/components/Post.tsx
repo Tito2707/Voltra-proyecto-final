@@ -2,6 +2,10 @@ import type { GameData } from "../types/Game";
 import PostInteraction from "./PostInteraction";
 
 export default function Post({ game }: { game: GameData }) {
+
+  console.log("JUEGO:", game.nombre);
+  console.log("IMAGEN:", game.imagen);
+
   return (
     <div
       key={game.id}
