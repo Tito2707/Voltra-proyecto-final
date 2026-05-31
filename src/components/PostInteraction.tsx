@@ -6,7 +6,7 @@ import bookmarkFill from "../assets/bookmark-fill.png";
 interface PostInteractionProps {
   initialLikes: number;
   ranking: number;
-  gameId: number;
+  gameId: number | string;
 }
 
 export default function PostInteraction({ initialLikes, ranking, gameId }: PostInteractionProps) {
@@ -22,7 +22,7 @@ export default function PostInteraction({ initialLikes, ranking, gameId }: PostI
     }
 
     const storedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-    setIsFavorite(storedFavorites.includes(gameId));
+    setIsFavorite(storedFavorites.some((id: number | string) => String(id) === String(gameId)));
   }, [gameId]);
 
   const handleLike = () => {
@@ -42,7 +42,9 @@ export default function PostInteraction({ initialLikes, ranking, gameId }: PostI
     let updatedFavorites;
 
     if (isFavorite) {
-      updatedFavorites = storedFavorites.filter((id: number) => id !== gameId);
+      updatedFavorites = storedFavorites.filter(
+        (id: number | string) => String(id) !== String(gameId)
+      );
     } else {
       updatedFavorites = [...storedFavorites, gameId];
     }
@@ -52,7 +54,7 @@ export default function PostInteraction({ initialLikes, ranking, gameId }: PostI
   };
 
   return (
-    <div className="flex items-center gap-4 mt-3">
+    <div className="flex items-center gap-3 sm:gap-4 mt-3">
       <div className="flex items-center gap-2">
         <button
           onClick={handleLike}
@@ -95,7 +97,7 @@ export default function PostInteraction({ initialLikes, ranking, gameId }: PostI
         />
       </div>
 
-      <div className="flex gap-1">
+      <div className="flex gap-1 ml-auto">
         {[1, 2, 3, 4, 5].map((star) => (
           <span
             key={star}

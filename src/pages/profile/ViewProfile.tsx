@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Post from "../../components/Post";
+import ProfileBanner from "../../components/ProfileBanner";
 import {
   getProfileByUsername,
   getPostsByUserId,
   getPostsByUsuario,
-  getPostCount,
 } from "../../services/ProfileService";
 import type { Profile } from "../../types/Profile";
 import type { GameData } from "../../types/Game";
@@ -15,40 +15,46 @@ export default function ViewProfile() {
   const displayUsername = username ? decodeURIComponent(username) : "";
   const [profile, setProfile] = useState<Profile | null>(null);
   const [games, setGames] = useState<GameData[]>([]);
-  const [postCount, setPostCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [postsLoading, setPostsLoading] = useState(true);
 
   useEffect(() => {
     if (!displayUsername) {
-      setLoading(false);
+      setPostsLoading(false);
       return;
     }
 
+    let active = true;
+
     const load = async () => {
-      setLoading(true);
+      setPostsLoading(true);
       const p = await getProfileByUsername(displayUsername);
+      if (!active) return;
+
       setProfile(p);
+
       if (p) {
-        const [posts, count] = await Promise.all([
-          getPostsByUserId(p.id),
-          getPostCount(p.id),
-        ]);
+        const posts = await getPostsByUserId(p.id);
+        if (!active) return;
         setGames(posts);
-        setPostCount(count);
       } else {
         const legacyPosts = await getPostsByUsuario(displayUsername);
+        if (!active) return;
         setGames(legacyPosts);
-        setPostCount(legacyPosts.length);
       }
-      setLoading(false);
+
+      setPostsLoading(false);
     };
 
     void load();
+
+    return () => {
+      active = false;
+    };
   }, [displayUsername]);
 
   if (!displayUsername) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-8 text-voltra-text">
+      <div className="page-container py-8 text-voltra-text">
         <p>Perfil no válido.</p>
         <Link to="/feed" className="text-voltra-accent mt-2 inline-block">
           Volver al feed
@@ -63,39 +69,38 @@ export default function ViewProfile() {
   const title = profile?.full_name || profile?.username || displayUsername;
 
   return (
-    <div id="profile-page" className="max-w-7xl mx-auto px-4 py-10 sm:px-6">
-      <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-12 sm:mb-14">
-        <img
-          src={avatarSrc}
-          alt={title}
-          className="w-24 h-24 shrink-0 rounded-full border-2 border-voltra-accent/40 object-cover"
-        />
-        <div className="min-w-0 space-y-2">
-          <h1 className="text-voltra-accent font-bold text-2xl sm:text-3xl">{title}</h1>
-          {profile && <p className="text-voltra-text/80">@{profile.username}</p>}
-          {profile?.bio && <p className="text-voltra-text/90 max-w-xl">{profile.bio}</p>}
-          <p className="text-voltra-text/80">
-            {loading
-              ? "Cargando posts…"
-              : `${postCount} post${postCount === 1 ? "" : "s"}`}
-          </p>
-          <Link to="/feed" className="text-voltra-accent text-sm mt-1 inline-block hover:underline">
+    <div id="profile-page" className="min-h-screen bg-voltra-bg">
+      <ProfileBanner
+        avatarSrc={avatarSrc}
+        name={title}
+        bio={profile?.bio}
+        editMode="none"
+      />
+
+      <div className="page-container profile-posts-section">
+        <div className="profile-posts-header">
+          <h2>Posts</h2>
+          <Link to="/feed" className="text-voltra-accent text-sm hover:underline no-underline">
             ← Volver al feed
           </Link>
         </div>
-      </div>
 
-      {loading ? (
-        <p className="text-voltra-text/70">Cargando…</p>
-      ) : games.length === 0 ? (
-        <p className="text-voltra-text/70">Este usuario aún no tiene publicaciones.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-10 md:gap-x-6 md:gap-y-12">
-          {games.map((game) => (
-            <Post key={game.id} game={game} />
-          ))}
-        </div>
-      )}
+        {postsLoading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-voltra-accent" />
+          </div>
+        ) : games.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <p className="text-voltra-text/70">Este usuario aún no tiene publicaciones.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
+            {games.map((game) => (
+              <Post key={String(game.id)} game={game} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

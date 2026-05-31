@@ -115,7 +115,7 @@ const Favorites = () => {
         </div>
       </div>
 
-      <div className="w-full max-w-7xl mx-auto px-4 md:px-8 lg:px-12 py-8 md:py-12">
+      <div className="page-container py-8 md:py-12">
         {loading ? (
           <div className="text-center text-voltra-text/60 py-20">
             <div className="flex flex-col items-center gap-4">
@@ -127,7 +127,7 @@ const Favorites = () => {
             </div>
           </div>
         ) : favoriteGames.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 justify-items-center">
             {favoriteGames.map((game, originalIndex) => (
               <div key={originalIndex} className="relative">
                 <div className="bg-voltra-bg rounded-xl overflow-hidden shadow-lg w-full text-voltra-text border border-voltra-text/10 transition-transform transform hover:scale-105 flex flex-col">

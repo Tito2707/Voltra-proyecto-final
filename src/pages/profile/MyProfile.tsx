@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import Post from "../../components/Post";
+import ProfileBanner from "../../components/ProfileBanner";
 import { getSessionUserId } from "../../services/AuthService";
-import { getMyProfileData } from "../../services/ProfileService";
+import { getProfileById, getPostsByUserId } from "../../services/ProfileService";
 import type { Profile } from "../../types/Profile";
 import type { GameData } from "../../types/Game";
 
 export default function MyProfile() {
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [postCount, setPostCount] = useState(0);
   const [games, setGames] = useState<GameData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [postsLoading, setPostsLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -20,17 +20,22 @@ export default function MyProfile() {
       if (!active) return;
 
       if (!userId) {
-        setLoading(false);
+        setProfileLoading(false);
+        setPostsLoading(false);
         return;
       }
 
-      const data = await getMyProfileData(userId);
+      const p = await getProfileById(userId);
       if (!active) return;
 
-      setProfile(data.profile);
-      setPostCount(data.postCount);
-      setGames(data.games);
-      setLoading(false);
+      setProfile(p);
+      setProfileLoading(false);
+
+      const posts = await getPostsByUserId(userId);
+      if (!active) return;
+
+      setGames(posts);
+      setPostsLoading(false);
     };
 
     void load();
@@ -40,7 +45,7 @@ export default function MyProfile() {
     };
   }, []);
 
-  if (loading) {
+  if (profileLoading) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
         <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-voltra-accent" />
@@ -50,7 +55,7 @@ export default function MyProfile() {
 
   if (!profile) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-8 text-voltra-text">
+      <div className="page-container py-8 text-voltra-text">
         <p>No se pudo cargar tu perfil.</p>
       </div>
     );
@@ -59,46 +64,45 @@ export default function MyProfile() {
   const avatarSrc =
     profile.avatar_url ||
     `https://i.pravatar.cc/120?u=${encodeURIComponent(profile.username)}`;
-  const memberSince = new Date(profile.created_at).toLocaleDateString();
+  const displayName = profile.full_name || profile.username;
 
   return (
-    <div id="profile-page" className="max-w-7xl mx-auto px-4 py-10 sm:px-6">
-      <div className="flex flex-col sm:flex-row sm:items-start gap-6 mb-12 sm:mb-14">
-        <img
-          src={avatarSrc}
-          alt={profile.username}
-          className="w-28 h-28 shrink-0 rounded-full border-2 border-voltra-accent/40 object-cover"
-        />
-        <div className="min-w-0 flex-1 space-y-2">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-voltra-accent font-bold text-2xl sm:text-3xl">
-              {profile.full_name || profile.username}
-            </h1>
-            <Link
-              to="/edit-profile"
-              className="text-voltra-accent border border-voltra-accent/60 px-3 py-1 rounded-full text-sm hover:bg-voltra-accent/10 no-underline"
-            >
-              Editar perfil
-            </Link>
-          </div>
-          <p className="text-voltra-text/80">@{profile.username}</p>
-          {profile.bio && <p className="text-voltra-text/90 max-w-xl">{profile.bio}</p>}
-          <p className="text-voltra-text/60 text-sm">Miembro desde {memberSince}</p>
-          <p className="text-voltra-text/80">
-            {postCount} post{postCount === 1 ? "" : "s"}
-          </p>
-        </div>
-      </div>
+    <div id="profile-page" className="min-h-screen bg-voltra-bg">
+      <ProfileBanner
+        avatarSrc={avatarSrc}
+        name={displayName}
+        bio={profile.bio}
+        editMode="edit"
+        editLink="/edit-profile"
+      />
 
-      {games.length === 0 ? (
-        <p className="text-voltra-text/70">Aún no tienes publicaciones.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-10 md:gap-x-6 md:gap-y-12">
-          {games.map((game) => (
-            <Post key={game.id} game={game} />
-          ))}
+      <div className="page-container profile-posts-section">
+        <div className="profile-posts-header">
+          <h2>Posts</h2>
+          <button type="button" className="profile-add-btn" aria-label="Crear post">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
         </div>
-      )}
+
+        {postsLoading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-voltra-accent" />
+          </div>
+        ) : games.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <i className="bi bi-chat-square-text text-5xl text-voltra-text/30 mb-4" />
+            <p className="text-voltra-text text-xl font-bold mb-2">Aún no tienes publicaciones</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 md:gap-6">
+            {games.map((game) => (
+              <Post key={String(game.id)} game={game} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -4,7 +4,7 @@ export type Review = {
 };
 
 export type GameData = {
-  id: number;
+  id: number | string;
   nombre: string;
   imagen: string;
   likes: number;

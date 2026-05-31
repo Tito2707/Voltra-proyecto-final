@@ -1,6 +1,7 @@
 import { supabase } from "../supabaseClient";
 import type { Profile } from "../types/Profile";
 import type { GameData } from "../types/Game";
+import { mapFeedRow } from "./ReviewService";
 
 type FeedPost = {
   id: string;
@@ -12,19 +13,7 @@ type FeedPost = {
   usuario: string | null;
 };
 
-const mapFeedPost = (post: FeedPost): GameData => ({
-  id: post.id as unknown as number,
-  nombre: post.game_name ?? "",
-  imagen: post.image_url ?? "",
-  likes: post.likes ?? 0,
-  ranking_estrellas: post.ranking_estrellas ?? 0,
-  reseñas: [
-    {
-      usuario: post.usuario ?? "",
-      reseña: post.content ?? "",
-    },
-  ],
-});
+const mapFeedPost = (post: FeedPost): GameData => mapFeedRow(post);
 
 const getProfileById = async (userId: string): Promise<Profile | null> => {
   const { data, error } = await supabase
@@ -34,6 +23,18 @@ const getProfileById = async (userId: string): Promise<Profile | null> => {
     .maybeSingle();
   if (error || !data) return null;
   return data as Profile;
+};
+
+const getProfileAvatar = async (userId: string): Promise<string> => {
+  const { data } = await supabase
+    .from("profiles")
+    .select("avatar_url, username")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (data?.avatar_url) return data.avatar_url;
+  const label = data?.username ?? userId;
+  return `https://i.pravatar.cc/80?u=${encodeURIComponent(label)}`;
 };
 
 const getMyProfileData = async (userId: string) => {
@@ -156,6 +157,7 @@ const removeAvatarFiles = async (userId: string) => {
 
 export {
   getProfileById,
+  getProfileAvatar,
   getProfileByUsername,
   getMyProfileData,
   getPostCount,

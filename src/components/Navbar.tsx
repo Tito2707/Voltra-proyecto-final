@@ -1,20 +1,50 @@
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getSessionUserId, onAuthStateChange } from "../services/AuthService";
+import { getProfileAvatar } from "../services/ProfileService";
+import { useSearch } from "../context/SearchContext";
+
+const avatarCache = new Map<string, string>();
+
+async function loadAvatar(userId: string): Promise<string> {
+  const cached = avatarCache.get(userId);
+  if (cached) return cached;
+
+  const url = await getProfileAvatar(userId);
+  avatarCache.set(userId, url);
+  return url;
+}
 
 export default function Navbar() {
   const location = useLocation();
+  const { searchTerm, setSearchTerm } = useSearch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    const { data: sub } = onAuthStateChange(async (_event, session) => {
-      setAuthenticated(!!session);
-    });
-    void getSessionUserId().then((userId) => {
+    let active = true;
+
+    const syncAuth = async (userId: string | null) => {
       setAuthenticated(!!userId);
+      if (!userId) {
+        setAvatarUrl(null);
+        return;
+      }
+      const url = await loadAvatar(userId);
+      if (active) setAvatarUrl(url);
+    };
+
+    const { data: sub } = onAuthStateChange(async (_event, session) => {
+      await syncAuth(session?.user.id ?? null);
     });
-    return () => sub.subscription.unsubscribe();
+
+    void getSessionUserId().then((userId) => syncAuth(userId));
+
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   const isActive = (path: string) => location.pathname === path;
@@ -35,8 +65,8 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full bg-voltra-bg shadow-md z-50 h-[110px]">
-        <div className="flex justify-between items-center px-10 h-full">
+      <nav className="fixed top-0 left-0 w-full bg-voltra-bg shadow-md z-50 h-[110px] border-b border-voltra-text/5">
+        <div className="page-container flex justify-between items-center h-full gap-4">
           <button
             onClick={toggleMenu}
             className="md:hidden z-50 text-voltra-text bg-voltra-bg rounded-full w-12 h-12 flex items-center justify-center border border-voltra-text/20 hover:border-voltra-accent/50 transition-colors"
@@ -45,9 +75,9 @@ export default function Navbar() {
             <i className="fa fa-bars"></i>
           </button>
 
-          <Link to="/feed" className="no-underline" onClick={closeMenu}>
+          <Link to="/feed" className="no-underline shrink-0" onClick={closeMenu}>
             <h2
-              className="text-voltra-accent font-bold tracking-wide text-3xl md:text-5xl md:ml-15"
+              className="text-voltra-accent font-bold tracking-wide text-3xl md:text-5xl"
               style={{ fontFamily: "Blatant, sans-serif" }}
             >
               VOLTRA
@@ -75,7 +105,7 @@ export default function Navbar() {
                   </li>
                   <li>
                     <Link to="/logout" className={navLinkClass("/logout")}>
-                      Logout
+                      Log out
                     </Link>
                   </li>
                 </>
@@ -89,7 +119,34 @@ export default function Navbar() {
             </ul>
           </div>
 
-          <div className="hidden md:block w-[60px]" />
+          <div className="hidden md:flex items-center gap-4 shrink-0">
+            <div className="nav-search">
+              <input
+                type="text"
+                placeholder="Search"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </div>
+
+            {authenticated && avatarUrl ? (
+              <Link to="/profile" className="no-underline">
+                <img src={avatarUrl} alt="Mi perfil" className="nav-avatar" />
+              </Link>
+            ) : (
+              <div className="w-[2.75rem]" />
+            )}
+          </div>
+
+          <div className="md:hidden w-12" />
         </div>
       </nav>
 
@@ -115,6 +172,23 @@ export default function Navbar() {
           </button>
 
           <h3 className="self-start text-voltra-text text-xl font-bold mb-8 font-poppins">Menu</h3>
+
+          <div className="nav-search mb-6 max-w-none">
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
 
           <nav className="flex flex-col gap-6">
             <Link to="/feed" onClick={closeMenu} className={mobileLinkClass("/feed")}>
@@ -143,7 +217,7 @@ export default function Navbar() {
                   <span className="text-xl">
                     <i className="bi bi-box-arrow-right"></i>
                   </span>{" "}
-                  Logout
+                  Log out
                 </Link>
               </>
             ) : (
