@@ -5,86 +5,202 @@
   --color-voltra-bg: #1c1c1c;
   --color-voltra-text: #f7f8fc;
   --color-voltra-accent: #ceff05;
+  --color-voltra-muted: rgb(247 248 252 / 0.6);
 }
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: system-ui, Avenir, Helvetica, Arial,
+    sans-serif;
+
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: dark;
+
   color: var(--color-voltra-text);
+
   background-color: var(--color-voltra-bg);
 
   font-synthesis: none;
+
   text-rendering: optimizeLegibility;
+
   -webkit-font-smoothing: antialiased;
+
   -moz-osx-font-smoothing: grayscale;
 }
 
-
 @font-face {
-  font-family: 'Blatant';
-  src: url('./assets/fonts/Blatant.woff2') format('woff2');
+  font-family: "Blatant";
+
+  src: url("./assets/fonts/Blatant.woff2")
+    format("woff2");
+
   font-weight: normal;
+
   font-style: normal;
+}
+
+* {
+  margin: 0;
+
+  padding: 0;
+
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+
+  min-height: 100vh;
+}
+
+body {
+  font-family: "Poppins";
+
+  background-color: var(--color-voltra-bg);
+
+  min-width: 320px;
+
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100% !important;
+
+  max-width: 100% !important;
+
+  margin: 0 !important;
+
+  padding: 0 !important;
 }
 
 a {
   font-weight: 500;
+
   color: var(--color-voltra-text);
+
   text-decoration: inherit;
 }
+
 a:hover {
   color: var(--color-voltra-accent);
 }
 
-
-
-body {
-  font-family: "Poppins";
-  background-color: var(--color-voltra-bg);
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
 h1 {
   font-size: 3.2em;
+
   line-height: 1.1;
+}
+
+#profile-page h1 {
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+@media (min-width: 640px) {
+  #profile-page h1 {
+    font-size: 1.875rem;
+    line-height: 1.2;
+  }
 }
 
 button {
   border-radius: 80%;
+
   border: 1px solid transparent;
+
   padding: 0.6em 1.2em;
+
   font-size: 1em;
+
   font-weight: 500;
+
   font-family: inherit;
+
   background-color: var(--color-voltra-bg);
+
   cursor: pointer;
+
   transition: border-color 0.25s;
 }
+
+button.voltra-btn {
+  border-radius: 9999px;
+
+  border: 1px solid var(--color-voltra-accent);
+
+  background-color: var(--color-voltra-accent);
+
+  color: var(--color-voltra-bg);
+
+  font-weight: 600;
+}
+
+button.voltra-btn:hover {
+  filter: brightness(1.1);
+
+  border-color: var(--color-voltra-accent);
+}
+
+.auth-form {
+  display: flex;
+
+  flex-direction: column;
+}
+
+.auth-form > input {
+  margin-top: 0;
+
+  margin-bottom: 1.25rem;
+}
+
+.auth-form > input:last-of-type {
+  margin-bottom: 1.5rem;
+}
+
+.auth-form-terms {
+  margin-bottom: 1.75rem;
+}
+
+.auth-form-submit {
+  margin-bottom: 1.25rem;
+}
+
+.auth-form-footer {
+  margin-top: 0.5rem;
+}
+
 button:hover {
   border-color: var(--color-voltra-accent);
 }
+
 button:focus,
 button:focus-visible {
-  outline: 2px solid var(--color-voltra-accent);
+  outline: 2px solid
+    var(--color-voltra-accent);
+
   outline-offset: 2px;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
     color: var(--color-voltra-text);
-    background-color: var(--color-voltra-bg);
+
+    background-color: var(
+      --color-voltra-bg
+    );
   }
+
   a:hover {
     color: var(--color-voltra-accent);
   }
+
   button {
-    background-color: var(--color-voltra-bg);
+    background-color: var(
+      --color-voltra-bg
+    );
   }
 }

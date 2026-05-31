@@ -1,15 +1,37 @@
 import { Link, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getSessionUserId, onAuthStateChange } from "../services/AuthService";
 
 export default function Navbar() {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const { data: sub } = onAuthStateChange(async (_event, session) => {
+      setAuthenticated(!!session);
+    });
+    void getSessionUserId().then((userId) => {
+      setAuthenticated(!!userId);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   const isActive = (path: string) => location.pathname === path;
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const closeMenu = () => setIsMenuOpen(false);
+
+  const navLinkClass = (path: string) =>
+    `text-[18px] font-normal transition-colors font-poppins no-underline ${
+      isActive(path) ? "text-voltra-accent" : "text-voltra-text/60 hover:text-voltra-accent"
+    }`;
+
+  const mobileLinkClass = (path: string) =>
+    `flex items-center gap-3 text-lg font-normal transition-colors font-poppins no-underline ${
+      isActive(path) ? "text-voltra-accent" : "text-voltra-text/60 hover:text-voltra-accent"
+    }`;
 
   return (
     <>
@@ -32,62 +54,42 @@ export default function Navbar() {
             </h2>
           </Link>
 
-          <div className="hidden md:flex absolute left-1/4 ml-[30px] transform -translate-x-1/2">
+          <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2">
             <ul className="flex gap-8 items-center list-none m-0 p-0">
               <li>
-                <Link
-                  to="/feed"
-                  className={`text-[18px] font-normal transition-colors font-poppins no-underline ${
-                    isActive("/feed")
-                      ? "text-voltra-accent"
-                      : "text-voltra-text/60 hover:text-voltra-accent"
-                  }`}
-                >
+                <Link to="/feed" className={navLinkClass("/feed")}>
                   Home
                 </Link>
               </li>
               <li>
-                <Link
-                  to="/favorites"
-                  className={`text-[18px] font-normal transition-colors font-poppins no-underline ${
-                    isActive("/favorites")
-                      ? "text-voltra-accent"
-                      : "text-voltra-text/60 hover:text-voltra-accent"
-                  }`}
-                >
+                <Link to="/favorites" className={navLinkClass("/favorites")}>
                   Favorites
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="/logout"
-                  className={`text-[18px] font-normal transition-colors font-poppins no-underline ${
-                    isActive("/logout")
-                      ? "text-voltra-accent"
-                      : "text-voltra-text/60 hover:text-voltra-accent"
-                  }`}
-                >
-                  Log out
-                </Link>
-              </li>
+              {authenticated ? (
+                <>
+                  <li>
+                    <Link to="/profile" className={navLinkClass("/profile")}>
+                      Profile
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/logout" className={navLinkClass("/logout")}>
+                      Logout
+                    </Link>
+                  </li>
+                </>
+              ) : (
+                <li>
+                  <Link to="/login" className={navLinkClass("/login")}>
+                    Login
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 
-          <Link to="/profile" className="no-underline hidden md:block" onClick={closeMenu}>
-            <img
-              src="https://i.pravatar.cc/150?img=12"
-              alt="User Profile"
-              className="w-[60px] h-[60px] rounded-full border-2 border-voltra-accent hover:border-voltra-accent/80 transition-colors cursor-pointer"
-            />
-          </Link>
-
-          <Link to="/profile" className="no-underline md:hidden" onClick={closeMenu}>
-            <img
-              src="https://i.pravatar.cc/150?img=12"
-              alt="User Profile"
-              className="w-[50px] h-[50px] rounded-full border-2 border-voltra-accent"
-            />
-          </Link>
+          <div className="hidden md:block w-[60px]" />
         </div>
       </nav>
 
@@ -106,7 +108,7 @@ export default function Navbar() {
         <div className="flex flex-col p-6 pt-8">
           <button
             onClick={closeMenu}
-            className="self-start text-voltra-text text- mb-8 rounded-full w-12 h-12 justify-center flex items-center border border-voltra-text/20"
+            className="self-start text-voltra-text mb-8 rounded-full w-12 h-12 justify-center flex items-center border border-voltra-text/20"
             aria-label="Close menu"
           >
             <i className="fa fa-bars"></i>
@@ -115,53 +117,43 @@ export default function Navbar() {
           <h3 className="self-start text-voltra-text text-xl font-bold mb-8 font-poppins">Menu</h3>
 
           <nav className="flex flex-col gap-6">
-            <Link
-              to="/feed"
-              onClick={closeMenu}
-              className={`flex items-center gap-3 text-lg font-normal transition-colors font-poppins no-underline ${
-                isActive("/feed") ? "text-voltra-accent" : "text-voltra-text/60 hover:text-voltra-accent"
-              }`}
-            >
+            <Link to="/feed" onClick={closeMenu} className={mobileLinkClass("/feed")}>
               <span className="text-xl">
                 <i className="bi bi-house"></i>
-              </span> Home
+              </span>{" "}
+              Home
             </Link>
 
-            <Link
-              to="/favorites"
-              onClick={closeMenu}
-              className={`flex items-center gap-3 text-lg font-normal transition-colors font-poppins no-underline ${
-                isActive("/favorites") ? "text-voltra-accent" : "text-voltra-text/60 hover:text-voltra-accent"
-              }`}
-            >
+            <Link to="/favorites" onClick={closeMenu} className={mobileLinkClass("/favorites")}>
               <span className="text-xl">
                 <i className="bi bi-star"></i>
-              </span> Favorites
+              </span>{" "}
+              Favorites
             </Link>
 
-            <Link
-              to="/profile"
-              onClick={closeMenu}
-              className={`flex items-center gap-3 text-lg font-normal transition-colors font-poppins no-underline ${
-                isActive("/profile") ? "text-voltra-accent" : "text-voltra-text/60 hover:text-voltra-accent"
-              }`}
-            >
-              <span className="text-xl">
-                <i className="bi bi-person"></i>
-              </span> Profile
-            </Link>
-
-            <Link
-              to="/logout"
-              onClick={closeMenu}
-              className={`flex items-center gap-3 text-lg font-normal transition-colors font-poppins no-underline ${
-                isActive("/logout") ? "text-voltra-accent" : "text-voltra-text/60 hover:text-voltra-accent"
-              }`}
-            >
-              <span className="text-xl">
-                <i className="bi bi-box-arrow-right"></i>
-              </span> Log out
-            </Link>
+            {authenticated ? (
+              <>
+                <Link to="/profile" onClick={closeMenu} className={mobileLinkClass("/profile")}>
+                  <span className="text-xl">
+                    <i className="bi bi-person"></i>
+                  </span>{" "}
+                  Profile
+                </Link>
+                <Link to="/logout" onClick={closeMenu} className={mobileLinkClass("/logout")}>
+                  <span className="text-xl">
+                    <i className="bi bi-box-arrow-right"></i>
+                  </span>{" "}
+                  Logout
+                </Link>
+              </>
+            ) : (
+              <Link to="/login" onClick={closeMenu} className={mobileLinkClass("/login")}>
+                <span className="text-xl">
+                  <i className="bi bi-box-arrow-in-right"></i>
+                </span>{" "}
+                Login
+              </Link>
+            )}
           </nav>
         </div>
       </div>

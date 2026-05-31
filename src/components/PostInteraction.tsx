@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import messageIcon from "../assets/message-icon.png";
 import bookmark from "../assets/bookmark.png";
 import bookmarkFill from "../assets/bookmark-fill.png";
@@ -11,8 +10,6 @@ interface PostInteractionProps {
 }
 
 export default function PostInteraction({ initialLikes, ranking, gameId }: PostInteractionProps) {
-  const navigate = useNavigate();
-
   const [likes, setLikes] = useState(initialLikes);
   const [liked, setLiked] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -39,8 +36,6 @@ export default function PostInteraction({ initialLikes, ranking, gameId }: PostI
     storedLikes[gameId] = { count: newLikes, liked: newLiked };
     localStorage.setItem("likes", JSON.stringify(storedLikes));
   };
-
-  const handleCommentClick = () => navigate(`/comments/${gameId}`);
 
   const handleFavoriteClick = () => {
     const storedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]");
@@ -85,7 +80,6 @@ export default function PostInteraction({ initialLikes, ranking, gameId }: PostI
 
       <div>
         <img
-          onClick={handleCommentClick}
           src={messageIcon}
           alt="comentarios"
           className="w-6 h-6 cursor-pointer"
@@ -108,6 +102,7 @@ export default function PostInteraction({ initialLikes, ranking, gameId }: PostI
             className="mask mask-star w-5 h-5"
             style={{
               backgroundColor: star <= ranking ? "#CEFF05" : "rgba(247, 248, 252, 0.25)",
+            
             }}
           ></span>
         ))}
