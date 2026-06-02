@@ -1,5 +1,4 @@
 import { useRef, useState } from "react";
-
 import "./CreatePost.css";
 
 import {
@@ -7,6 +6,8 @@ import {
   X,
   ImagePlus,
 } from "lucide-react";
+
+import { supabase } from "../../../services/supabase";
 
 const games = [
   "Minecraft",
@@ -25,11 +26,14 @@ function CreatePost() {
   const [description, setDescription] =
     useState("");
 
-  const [rating, setRating] = useState(2);
+  const [rating, setRating] =
+    useState(2);
 
-  const [image, setImage] = useState<
-    string | null
-  >(null);
+  const [image, setImage] =
+    useState<string | null>(null);
+
+  const [loading, setLoading] =
+    useState(false);
 
   const inputRef =
     useRef<HTMLInputElement>(null);
@@ -37,7 +41,8 @@ function CreatePost() {
   const handleImageUpload = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const file = e.target.files?.[0];
+    const file =
+      e.target.files?.[0];
 
     if (file) {
       const imageUrl =
@@ -47,10 +52,92 @@ function CreatePost() {
     }
   };
 
+  const handleCreatePost =
+    async () => {
+      try {
+        if (
+          !selectedGame ||
+          !description
+        ) {
+          alert(
+            "Completa todos los campos"
+          );
+          return;
+        }
+
+        setLoading(true);
+
+        const { error } =
+          await supabase
+            .from("feed")
+            .insert([
+              {
+                content:
+                  description,
+
+                image_url:
+                  image,
+
+                user_id:
+                  "11111111-1111-1111-1111-111111111111",
+
+                game_name:
+                  selectedGame,
+
+                ranking_estrellas:
+                  rating,
+
+                usuario:
+                  "Alejandro",
+
+                likes: 0,
+
+                is_favorite:
+                  false,
+              },
+            ]);
+
+        if (error) {
+          console.log(error);
+
+          alert(
+            "Error creando publicación"
+          );
+
+          return;
+        }
+
+        alert(
+          "Publicación creada"
+        );
+
+        setSelectedGame("");
+
+        setDescription("");
+
+        setRating(2);
+
+        setImage(null);
+
+      } catch (error) {
+
+        console.log(error);
+
+        alert(
+          "Error creando publicación"
+        );
+
+      } finally {
+
+        setLoading(false);
+
+      }
+    };
+
   return (
     <div className="create-post-page">
+
       <div className="create-post-card">
-        {/* IMAGE */}
 
         <div
           className="upload-area"
@@ -58,6 +145,7 @@ function CreatePost() {
             inputRef.current?.click()
           }
         >
+
           {image ? (
             <img
               src={image}
@@ -75,13 +163,15 @@ function CreatePost() {
             type="file"
             accept="image/*"
             hidden
-            onChange={handleImageUpload}
+            onChange={
+              handleImageUpload
+            }
           />
+
         </div>
 
-        {/* SELECT */}
-
         <div className="dropdown-container">
+
           <div
             className="dropdown-header"
             onClick={() =>
@@ -90,17 +180,18 @@ function CreatePost() {
               )
             }
           >
+
             <span>
               {selectedGame ||
                 "select your game"}
             </span>
 
             <div className="dropdown-icons">
+
               <X
                 size={18}
                 onClick={(e) => {
                   e.stopPropagation();
-
                   setSelectedGame("");
                 }}
               />
@@ -108,59 +199,71 @@ function CreatePost() {
               <div className="divider" />
 
               <ChevronDown size={20} />
+
             </div>
+
           </div>
 
           {dropdownOpen && (
             <div className="dropdown-menu">
-              {games.map((game) => (
-                <div
-                  key={game}
-                  className={`dropdown-item ${
-                    selectedGame === game
-                      ? "active"
-                      : ""
-                  }`}
-                  onClick={() => {
-                    setSelectedGame(game);
 
-                    setDropdownOpen(false);
-                  }}
-                >
-                  {game}
-                </div>
-              ))}
+              {games.map(
+                (game) => (
+                  <div
+                    key={game}
+                    className={`dropdown-item ${
+                      selectedGame === game
+                        ? "active"
+                        : ""
+                    }`}
+                    onClick={() => {
+                      setSelectedGame(
+                        game
+                      );
+
+                      setDropdownOpen(
+                        false
+                      );
+                    }}
+                  >
+                    {game}
+                  </div>
+                )
+              )}
+
             </div>
           )}
-        </div>
 
-        {/* TEXTAREA */}
+        </div>
 
         <textarea
           placeholder="Tell us your adventure in this game..."
           value={description}
-          onChange={(
-            e: React.ChangeEvent<HTMLTextAreaElement>
-          ) =>
+          onChange={(e) =>
             setDescription(
               e.target.value
             )
           }
         />
 
-        {/* FOOTER */}
-
         <div className="post-footer">
+
           <div className="rating-wrapper">
-            <p>Rate your experience...</p>
+
+            <p>
+              Rate your experience...
+            </p>
 
             <div className="rating">
+
               {[1, 2, 3, 4, 5].map(
                 (star) => (
                   <span
                     key={star}
                     onClick={() =>
-                      setRating(star)
+                      setRating(
+                        star
+                      )
                     }
                     style={{
                       color:
@@ -173,20 +276,47 @@ function CreatePost() {
                   </span>
                 )
               )}
+
             </div>
+
           </div>
 
           <div className="buttons">
-            <button className="cancel-btn">
+
+            <button
+              className="cancel-btn"
+              onClick={() => {
+                setSelectedGame("");
+                setDescription("");
+                setRating(2);
+                setImage(null);
+              }}
+            >
               Cancel
             </button>
 
-            <button className="post-btn">
-              Post
+            <button
+              className="post-btn"
+              onClick={
+                handleCreatePost
+              }
+              disabled={
+                loading
+              }
+            >
+              {
+                loading
+                  ? "Posting..."
+                  : "Post"
+              }
             </button>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
   );
 }
