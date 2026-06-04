@@ -1,236 +1,278 @@
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
+
 import { getSessionUserId, onAuthStateChange } from "../services/AuthService";
 import { getProfileAvatar } from "../services/ProfileService";
+import { searchGames } from "../services/GameService";
 import { useSearch } from "../context/SearchContext";
 
 const avatarCache = new Map<string, string>();
 
 async function loadAvatar(userId: string): Promise<string> {
   const cached = avatarCache.get(userId);
+
   if (cached) return cached;
 
   const url = await getProfileAvatar(userId);
+
   avatarCache.set(userId, url);
+
   return url;
 }
 
 export default function Navbar() {
   const location = useLocation();
+
   const { searchTerm, setSearchTerm } = useSearch();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  const [authenticated, setAuthenticated] =
+    useState(false);
+
+  const [avatarUrl, setAvatarUrl] =
+    useState<string | null>(null);
+
+  const [suggestions, setSuggestions] =
+    useState<any[]>([]);
+
+  const [loadingSearch, setLoadingSearch] =
+    useState(false);
 
   useEffect(() => {
     let active = true;
 
-    const syncAuth = async (userId: string | null) => {
+    const syncAuth = async (
+      userId: string | null
+    ) => {
       setAuthenticated(!!userId);
+
       if (!userId) {
         setAvatarUrl(null);
         return;
       }
-      const url = await loadAvatar(userId);
-      if (active) setAvatarUrl(url);
+
+      const url =
+        await loadAvatar(userId);
+
+      if (active) {
+        setAvatarUrl(url);
+      }
     };
 
-    const { data: sub } = onAuthStateChange(async (_event, session) => {
-      await syncAuth(session?.user.id ?? null);
-    });
+    const { data: sub } =
+      onAuthStateChange(
+        async (_event, session) => {
+          await syncAuth(
+            session?.user.id ??
+              null
+          );
+        }
+      );
 
-    void getSessionUserId().then((userId) => syncAuth(userId));
+    void getSessionUserId().then(
+      (userId) =>
+        syncAuth(userId)
+    );
 
     return () => {
       active = false;
+
       sub.subscription.unsubscribe();
     };
   }, []);
 
-  const isActive = (path: string) => location.pathname === path;
+  useEffect(() => {
+    const fetchGames =
+      async () => {
+        if (
+          searchTerm.length < 2
+        ) {
+          setSuggestions([]);
+          return;
+        }
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+        setLoadingSearch(true);
 
-  const closeMenu = () => setIsMenuOpen(false);
+        const results =
+          await searchGames(
+            searchTerm
+          );
 
-  const navLinkClass = (path: string) =>
-    `text-[18px] font-normal transition-colors font-poppins no-underline ${
-      isActive(path) ? "text-voltra-accent" : "text-voltra-text/60 hover:text-voltra-accent"
-    }`;
+        setSuggestions(results);
 
-  const mobileLinkClass = (path: string) =>
-    `flex items-center gap-3 text-lg font-normal transition-colors font-poppins no-underline ${
-      isActive(path) ? "text-voltra-accent" : "text-voltra-text/60 hover:text-voltra-accent"
-    }`;
+        setLoadingSearch(false);
+      };
+
+    const timer =
+      setTimeout(
+        fetchGames,
+        250
+      );
+
+    return () =>
+      clearTimeout(timer);
+  }, [searchTerm]);
+
+  const isActive = (
+    path: string
+  ) =>
+    location.pathname === path;
 
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full bg-voltra-bg shadow-md z-50 h-[110px] border-b border-voltra-text/5">
-        <div className="page-container flex justify-between items-center h-full gap-4">
-          <button
-            onClick={toggleMenu}
-            className="md:hidden z-50 text-voltra-text bg-voltra-bg rounded-full w-12 h-12 flex items-center justify-center border border-voltra-text/20 hover:border-voltra-accent/50 transition-colors"
-            aria-label="Toggle menu"
-          >
-            <i className="fa fa-bars"></i>
-          </button>
+      <nav className="fixed top-0 left-0 w-full bg-voltra-bg shadow-md z-50 h-[110px]">
 
-          <Link to="/feed" className="no-underline shrink-0" onClick={closeMenu}>
+        <div className="page-container flex justify-between items-center h-full">
+
+          <Link to="/feed">
             <h2
-              className="text-voltra-accent font-bold tracking-wide text-3xl md:text-5xl"
-              style={{ fontFamily: "Blatant, sans-serif" }}
+              className="text-voltra-accent text-5xl"
+              style={{
+                fontFamily:
+                  "Blatant",
+              }}
             >
               VOLTRA
             </h2>
           </Link>
 
-          <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2">
-            <ul className="flex gap-8 items-center list-none m-0 p-0">
-              <li>
-                <Link to="/feed" className={navLinkClass("/feed")}>
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link to="/favorites" className={navLinkClass("/favorites")}>
-                  Favorites
-                </Link>
-              </li>
-              {authenticated ? (
-                <>
-                  <li>
-                    <Link to="/profile" className={navLinkClass("/profile")}>
-                      Profile
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/logout" className={navLinkClass("/logout")}>
-                      Log out
-                    </Link>
-                  </li>
-                </>
-              ) : (
-                <li>
-                  <Link to="/login" className={navLinkClass("/login")}>
-                    Login
-                  </Link>
-                </li>
-              )}
-            </ul>
-          </div>
+          <div className="hidden md:flex gap-8">
 
-          <div className="hidden md:flex items-center gap-4 shrink-0">
-            <div className="nav-search">
-              <input
-                type="text"
-                placeholder="Search"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-
-            {authenticated && avatarUrl ? (
-              <Link to="/profile" className="no-underline">
-                <img src={avatarUrl} alt="Mi perfil" className="nav-avatar" />
-              </Link>
-            ) : (
-              <div className="w-[2.75rem]" />
-            )}
-          </div>
-
-          <div className="md:hidden w-12" />
-        </div>
-      </nav>
-
-      <div
-        className={`fixed inset-0 bg-voltra-bg/50 z-40 transition-opacity md:hidden ${
-          isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        onClick={closeMenu}
-      ></div>
-
-      <div
-        className={`fixed top-0 left-0 h-full w-72 bg-voltra-bg border-r border-voltra-text/10 z-50 transform transition-transform duration-300 ease-in-out md:hidden ${
-          isMenuOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-      >
-        <div className="flex flex-col p-6 pt-8">
-          <button
-            onClick={closeMenu}
-            className="self-start text-voltra-text mb-8 rounded-full w-12 h-12 justify-center flex items-center border border-voltra-text/20"
-            aria-label="Close menu"
-          >
-            <i className="fa fa-bars"></i>
-          </button>
-
-          <h3 className="self-start text-voltra-text text-xl font-bold mb-8 font-poppins">Menu</h3>
-
-          <div className="nav-search mb-6 max-w-none">
-            <input
-              type="text"
-              placeholder="Search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-          </div>
-
-          <nav className="flex flex-col gap-6">
-            <Link to="/feed" onClick={closeMenu} className={mobileLinkClass("/feed")}>
-              <span className="text-xl">
-                <i className="bi bi-house"></i>
-              </span>{" "}
+            <Link
+              to="/feed"
+              className={
+                isActive("/feed")
+                  ? "text-voltra-accent"
+                  : ""
+              }
+            >
               Home
             </Link>
 
-            <Link to="/favorites" onClick={closeMenu} className={mobileLinkClass("/favorites")}>
-              <span className="text-xl">
-                <i className="bi bi-star"></i>
-              </span>{" "}
+            <Link to="/favorites">
               Favorites
             </Link>
 
             {authenticated ? (
               <>
-                <Link to="/profile" onClick={closeMenu} className={mobileLinkClass("/profile")}>
-                  <span className="text-xl">
-                    <i className="bi bi-person"></i>
-                  </span>{" "}
+                <Link to="/profile">
                   Profile
                 </Link>
-                <Link to="/logout" onClick={closeMenu} className={mobileLinkClass("/logout")}>
-                  <span className="text-xl">
-                    <i className="bi bi-box-arrow-right"></i>
-                  </span>{" "}
-                  Log out
+
+                <Link to="/logout">
+                  Logout
                 </Link>
               </>
             ) : (
-              <Link to="/login" onClick={closeMenu} className={mobileLinkClass("/login")}>
-                <span className="text-xl">
-                  <i className="bi bi-box-arrow-in-right"></i>
-                </span>{" "}
+              <Link to="/login">
                 Login
               </Link>
             )}
-          </nav>
+
+          </div>
+
+          <div className="relative hidden md:flex items-center gap-4">
+
+            <div className="nav-search relative">
+
+              <input
+                type="text"
+                placeholder="Search game..."
+                value={searchTerm}
+                onChange={(e) =>
+                  setSearchTerm(
+                    e.target.value
+                  )
+                }
+              />
+
+              {(loadingSearch ||
+                suggestions.length >
+                  0) && (
+
+                <div
+                  className="
+                    absolute
+                    top-[58px]
+                    left-0
+                    w-full
+                    rounded-xl
+                    bg-[#1C1C1C]
+                    overflow-hidden
+                    border
+                    border-white/10
+                    shadow-lg
+                  "
+                >
+
+                  {loadingSearch && (
+                    <div className="px-4 py-3 text-white/60">
+                      Buscando...
+                    </div>
+                  )}
+
+                  {suggestions.map(
+                    (
+                      game
+                    ) => (
+
+                      <div
+                        key={
+                          game.id
+                        }
+                        className="
+                          px-4
+                          py-3
+                          hover:bg-white/5
+                          cursor-pointer
+                          transition-colors
+                          border-b
+                          border-white/5
+                          last:border-none
+                        "
+                      >
+
+                        <span
+                          className="
+                            text-white
+                            text-[16px]
+                          "
+                        >
+                          {game.title}
+                        </span>
+
+                      </div>
+
+                    )
+                  )}
+
+                </div>
+
+              )}
+
+            </div>
+
+            {authenticated &&
+              avatarUrl && (
+                <Link to="/profile">
+
+                  <img
+                    src={
+                      avatarUrl
+                    }
+                    className="nav-avatar"
+                    alt="Mi perfil"
+                  />
+
+                </Link>
+              )}
+
+          </div>
+
         </div>
-      </div>
+
+      </nav>
     </>
   );
 }
