@@ -9,20 +9,44 @@ interface PostInteractionProps {
   gameId: number | string;
 }
 
-export default function PostInteraction({ initialLikes, ranking, gameId }: PostInteractionProps) {
+export default function PostInteraction({
+  initialLikes,
+  ranking,
+  gameId,
+}: PostInteractionProps) {
   const [likes, setLikes] = useState(initialLikes);
   const [liked, setLiked] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [currentRanking, setCurrentRanking] = useState(ranking);
 
   useEffect(() => {
-    const storedLikes = JSON.parse(localStorage.getItem("likes") || "{}");
+    const storedLikes = JSON.parse(
+      localStorage.getItem("likes") || "{}"
+    );
+
     if (storedLikes[gameId]) {
       setLikes(storedLikes[gameId].count);
       setLiked(storedLikes[gameId].liked);
     }
 
-    const storedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-    setIsFavorite(storedFavorites.some((id: number | string) => String(id) === String(gameId)));
+    const storedFavorites = JSON.parse(
+      localStorage.getItem("favorites") || "[]"
+    );
+
+    setIsFavorite(
+      storedFavorites.some(
+        (id: number | string) =>
+          String(id) === String(gameId)
+      )
+    );
+
+    const storedRatings = JSON.parse(
+      localStorage.getItem("ratings") || "{}"
+    );
+
+    if (storedRatings[gameId]) {
+      setCurrentRanking(storedRatings[gameId]);
+    }
   }, [gameId]);
 
   const handleLike = () => {
@@ -32,25 +56,61 @@ export default function PostInteraction({ initialLikes, ranking, gameId }: PostI
     setLiked(newLiked);
     setLikes(newLikes);
 
-    const storedLikes = JSON.parse(localStorage.getItem("likes") || "{}");
-    storedLikes[gameId] = { count: newLikes, liked: newLiked };
-    localStorage.setItem("likes", JSON.stringify(storedLikes));
+    const storedLikes = JSON.parse(
+      localStorage.getItem("likes") || "{}"
+    );
+
+    storedLikes[gameId] = {
+      count: newLikes,
+      liked: newLiked,
+    };
+
+    localStorage.setItem(
+      "likes",
+      JSON.stringify(storedLikes)
+    );
   };
 
   const handleFavoriteClick = () => {
-    const storedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+    const storedFavorites = JSON.parse(
+      localStorage.getItem("favorites") || "[]"
+    );
+
     let updatedFavorites;
 
     if (isFavorite) {
       updatedFavorites = storedFavorites.filter(
-        (id: number | string) => String(id) !== String(gameId)
+        (id: number | string) =>
+          String(id) !== String(gameId)
       );
     } else {
-      updatedFavorites = [...storedFavorites, gameId];
+      updatedFavorites = [
+        ...storedFavorites,
+        gameId,
+      ];
     }
 
-    localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+    localStorage.setItem(
+      "favorites",
+      JSON.stringify(updatedFavorites)
+    );
+
     setIsFavorite(!isFavorite);
+  };
+
+  const handleRating = (star: number) => {
+    setCurrentRanking(star);
+
+    const storedRatings = JSON.parse(
+      localStorage.getItem("ratings") || "{}"
+    );
+
+    storedRatings[gameId] = star;
+
+    localStorage.setItem(
+      "ratings",
+      JSON.stringify(storedRatings)
+    );
   };
 
   return (
@@ -72,12 +132,20 @@ export default function PostInteraction({ initialLikes, ranking, gameId }: PostI
         >
           <i
             className={`bx ${
-              liked ? "bxs-heart text-voltra-accent" : "bx-heart text-voltra-text/50"
+              liked
+                ? "bxs-heart text-voltra-accent"
+                : "bx-heart text-voltra-text/50"
             } transition-all duration-200`}
-            style={{ fontSize: "22px", lineHeight: "1" }}
+            style={{
+              fontSize: "22px",
+              lineHeight: "1",
+            }}
           ></i>
         </button>
-        <span className="text-sm text-voltra-text/90">{likes}</span>
+
+        <span className="text-sm text-voltra-text/90">
+          {likes}
+        </span>
       </div>
 
       <div>
@@ -101,10 +169,13 @@ export default function PostInteraction({ initialLikes, ranking, gameId }: PostI
         {[1, 2, 3, 4, 5].map((star) => (
           <span
             key={star}
-            className="mask mask-star w-5 h-5"
+            onClick={() => handleRating(star)}
+            className="mask mask-star w-5 h-5 cursor-pointer"
             style={{
-              backgroundColor: star <= ranking ? "#CEFF05" : "rgba(247, 248, 252, 0.25)",
-            
+              backgroundColor:
+                star <= currentRanking
+                  ? "#CEFF05"
+                  : "rgba(247, 248, 252, 0.25)",
             }}
           ></span>
         ))}

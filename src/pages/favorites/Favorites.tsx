@@ -9,14 +9,17 @@ const Favorites = () => {
   useEffect(() => {
     const loadFavorites = async () => {
       try {
-        const favoriteIds: number[] = JSON.parse(
+        const favoriteIds = JSON.parse(
           localStorage.getItem("favorites") || "[]"
         );
 
         const allGames = await getReviews();
 
-        const favorites = allGames.filter(
-          (_: GameData, index: number) => favoriteIds.includes(index)
+        const favorites = allGames.filter((game: GameData) =>
+          favoriteIds.some(
+            (id: string | number) =>
+              String(id) === String(game.id)
+          )
         );
 
         setFavoriteGames(favorites);
@@ -41,36 +44,47 @@ const Favorites = () => {
   }, []);
 
   const removeFromFavorites = async (
-    gameIndex: number,
+    gameId: string | number,
     gameName: string
   ) => {
-    console.log(`Eliminando favorito: ${gameName} (ID: ${gameIndex})`);
+    console.log(`Eliminando favorito: ${gameName} (ID: ${gameId})`);
 
-    const favoriteIds: number[] = JSON.parse(
+    const favoriteIds = JSON.parse(
       localStorage.getItem("favorites") || "[]"
     );
 
     const updatedFavorites = favoriteIds.filter(
-      (id: number) => id !== gameIndex
+      (id: string | number) =>
+        String(id) !== String(gameId)
     );
 
-    localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+    localStorage.setItem(
+      "favorites",
+      JSON.stringify(updatedFavorites)
+    );
 
     const allGames = await getReviews();
 
-    const favorites = allGames.filter(
-      (_: GameData, index: number) => updatedFavorites.includes(index)
+    const favorites = allGames.filter((game: GameData) =>
+      updatedFavorites.some(
+        (id: string | number) =>
+          String(id) === String(game.id)
+      )
     );
 
     setFavoriteGames(favorites);
   };
 
-  const getGameId = async (gameName: string): Promise<number> => {
+  const getGameId = async (
+    gameName: string
+  ): Promise<string | number> => {
     const allGames = await getReviews();
 
-    return allGames.findIndex(
+    const game = allGames.find(
       (g: GameData) => g.nombre === gameName
     );
+
+    return game?.id ?? "";
   };
 
   return (
@@ -139,7 +153,6 @@ const Favorites = () => {
                   <button
                     onClick={async () => {
                       const gameId = await getGameId(game.nombre);
-
                       removeFromFavorites(gameId, game.nombre);
                     }}
                     className="absolute top-3 right-3 bg-voltra-accent hover:bg-voltra-accent/90 text-voltra-bg p-3 rounded-full w-12 h-12 flex items-center justify-center z-10 transition-all duration-200 shadow-lg border-0 outline-none hover:scale-110"
@@ -159,7 +172,6 @@ const Favorites = () => {
                       viewBox="0 0 24 24"
                     >
                       <path d="M3 6h18v2H3V6zm2 3h14l-1 14H6L5 9zm5-6h4v1H10V3z" />
-
                       <path d="M9 4h6v1H9V4zM7 8h10l-.9 12H7.9L7 8zm2 2v8h2v-8H9zm4 0v8h2v-8h-2z" />
                     </svg>
                   </button>
